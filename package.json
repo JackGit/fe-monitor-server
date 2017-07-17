@@ -1,0 +1,31 @@
+{
+  "name": "fm-server",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jackgit/fm-server.git"
+  },
+  "author": "ygjack414@hotmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jackgit/fm-server/issues"
+  },
+  "homepage": "https://github.com/jackgit/fm-server#readme",
+  "dependencies": {
+    "koa": "^2.3.0",
+    "koa-bodyparser": "^4.2.0",
+    "koa-favicon": "^2.0.0",
+    "koa-logger": "^3.0.1",
+    "koa-onerror": "^3.1.0",
+    "koa-router": "^7.2.1",
+    "koa-session": "^5.4.0",
+    "koa-static": "^4.0.1",
+    "lib-qqwry": "^1.0.2",
+    "ua-parser-js": "^0.7.13"
+  }
+}
