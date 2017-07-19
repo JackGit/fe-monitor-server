@@ -5,9 +5,9 @@ const setBasicInfoToAVObject = require('../utils/service').setBasicInfoToAVObjec
 exports.create = async function (basicInfo, trace) {
   const pv = new PageView()
 
-  setBasicInfoToAVObject(pageView, basicInfo)
-  pv.set('navigationTiming', trace.timing.navigation)
-  pv.set('resourceTiming', trace.timing.resource)
+  setBasicInfoToAVObject(pv, basicInfo)
+  pv.set('navigationTiming', trace.timing ? trace.timing.navigation : [])
+  pv.set('resourceTiming', trace.timing ? trace.timing.resource : [])
 
   return pv.save()
 }

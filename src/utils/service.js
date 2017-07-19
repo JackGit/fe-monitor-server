@@ -1,5 +1,6 @@
 const uaParser = require('ua-parser-js')
 const ipQuery = require('lib-qqwry').init().speed()
+const random = require('lodash.random')
 
 /**
  * ip, os, browser, platform, page url, full url, network provider, location, rawUserAgent, resolution
@@ -28,11 +29,22 @@ exports.extendBasicInfo = function (data) {
   }
 }
 
-exports.getIPInfo = function (ip) {
-  const result = ipQuery.searchIP(ip)
-  return {
-    province: getProvinceShortName(result.Country),
-    networkOperator: getNetworkOperator(result.Area)
+exports.fakeIP = function () {
+  return [random(1, 254), random(1, 254), random(1, 254), random(1, 254)].join('.')
+}
+
+function getIPInfo (ip) {
+  if (!ip) {
+    return {
+      province: '',
+      networkOperator: ''
+    }
+  } else {
+    const result = ipQuery.searchIP(ip)
+    return {
+      province: getProvinceShortName(result.Country.trim()),
+      networkOperator: getNetworkOperator(result.Area.trim())
+    }
   }
 }
 

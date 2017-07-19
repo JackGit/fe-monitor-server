@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/jackgit/fm-server#readme",
   "dependencies": {
+    "kcors": "^2.2.1",
     "koa": "^2.3.0",
     "koa-bodyparser": "^4.2.0",
     "koa-favicon": "^2.0.0",
@@ -29,6 +30,7 @@
     "koa-static": "^4.0.1",
     "leancloud-storage": "^3.0.2",
     "lib-qqwry": "^1.0.2",
+    "lodash.random": "^3.2.0",
     "ua-parser-js": "^0.7.13"
   }
 }

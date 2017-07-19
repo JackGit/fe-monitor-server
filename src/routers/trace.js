@@ -4,10 +4,11 @@ const uvService = require('../services/unique-visitor')
 const exceptionService = require('../services/exception')
 const asyncRequestService = require('../services/async-request')
 const extendBasicInfo = require('../utils/service').extendBasicInfo
+const fakeIP = require('../utils/service').fakeIP
 
 router.post('/', async (ctx, next) => {
   let response
-  const ip = ctx.headers['x-real-ip']
+  const ip = ctx.headers['x-real-ip'] || fakeIP()
   const request = ctx.request.body
   const basic = request.basic
   const traces = request.traces
@@ -35,13 +36,11 @@ router.post('/', async (ctx, next) => {
         default:
           response = ''
       }
-      console.log('trace create response', response)
     }))
-
     ctx.body = ''
   } catch (e) {
     ctx.body = ''
-    ctx.status = ''
+    ctx.status = 500
   }
 })
 

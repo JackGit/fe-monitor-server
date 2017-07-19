@@ -8,7 +8,7 @@ exports.create = async function (basicInfo, trace) {
   setBasicInfoToAVObject(exception, basicInfo)
   exception.set('name', trace.name)
   exception.set('message', trace.message)
-  exception.set('stack', trace.stack)
+  exception.set('stack', trace.stack || [])
 
   return exception.save()
 }
