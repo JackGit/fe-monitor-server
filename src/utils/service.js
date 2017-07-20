@@ -8,7 +8,7 @@ const random = require('lodash.random')
  * @param  {Object} basicInfo [description]
  */
 exports.setBasicInfoToAVObject = function (avObject, basicInfo) {
-  ['ip', 'pageUrl', 'fullUrl', 'os', 'browser', 'device', 'resolution', 'province', 'networkOperator']
+  ['ip', 'pageUrl', 'fullUrl', 'os', 'browser', 'device', 'resolution', 'province', 'networkOperator', 'userAgent']
   .forEach(key => avObject.set(key, basicInfo[key]))
 }
 
@@ -25,7 +25,8 @@ exports.extendBasicInfo = function (data) {
     device: uaInfo.device,
     resolution: data.resolution,
     province: ipInfo.province,
-    networkOperator: ipInfo.networkOperator
+    networkOperator: ipInfo.networkOperator,
+    userAgent: data.userAgent
   }
 }
 
