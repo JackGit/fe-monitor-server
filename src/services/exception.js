@@ -12,3 +12,17 @@ exports.create = async function (basicInfo, trace) {
 
   return exception.save()
 }
+
+exports.getList = async function (condition) {
+  const query = new AV.Query('Exception')
+  query.greaterThanOrEqualTo('createdAt', new Date(condition.from))
+  query.lessThan('createdAt', new Date(condition.end))
+  query.ascending('createdAt')
+  query.limit(1000)
+  return query.find()
+}
+
+exports.get = async function (id) {
+  const query = new AV.Query('Exception')
+  return query.get(id)
+}
