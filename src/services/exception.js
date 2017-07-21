@@ -17,7 +17,7 @@ exports.getList = async function (condition) {
   const query = new AV.Query('Exception')
   query.greaterThanOrEqualTo('createdAt', new Date(condition.from))
   query.lessThan('createdAt', new Date(condition.end))
-  query.decending('createdAt')
+  query.descending('createdAt')
   query.limit(1000)
   return query.find()
 }
