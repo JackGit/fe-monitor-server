@@ -11,4 +11,9 @@ router.get('/', async (ctx, next) => {
   ctx.body = result
 })
 
+router.get('/:pageViewId', async (ctx, next) => {
+  const result = await pageViewService.get(ctx.params.pageViewId)
+  ctx.body = result
+})
+
 module.exports = router

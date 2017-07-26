@@ -23,3 +23,8 @@ exports.getList = async function (condition) {
 
   return query.find()
 }
+
+exports.get = async function (id) {
+  const query = new AV.Query('PageView')
+  return query.get(id)
+}
