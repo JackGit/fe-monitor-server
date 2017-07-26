@@ -16,8 +16,12 @@ exports.getList = async function (condition) {
   const query = new AV.Query('PageView')
 
   query.greaterThanOrEqualTo('createdAt', new Date(condition.from))
-  query.equalTo('pageUrl', decodeURIComponent(condition.pageUrl))
   query.lessThan('createdAt', new Date(condition.end))
+
+  if (condition.pageUrl) {
+    query.equalTo('pageUrl', decodeURIComponent(condition.pageUrl))
+  }
+
   query.descending('createdAt')
   query.limit(condition.limit)
 
