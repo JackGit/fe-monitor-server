@@ -7,8 +7,12 @@ const asyncRequestService = require('../services/async-request')
  */
 router.get('/', async (ctx, next) => {
   const asyncRequests = await asyncRequestService.getList({
-    from: ctx.query.from * 1,
-    end: ctx.query.end * 1
+    from: +ctx.query.from,
+    end: +ctx.query.end,
+    pageUrl: ctx.query.pageUrl || null,
+    url: ctx.query.url || null,
+    method: ctx.query.method || null,
+    limit: ctx.query.limit || 1000
   })
   ctx.body = asyncRequests
 })

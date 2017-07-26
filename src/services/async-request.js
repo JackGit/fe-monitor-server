@@ -21,8 +21,19 @@ exports.getList = async function (condition) {
   const query = new AV.Query('AsyncRequest')
   query.greaterThanOrEqualTo('startAt', new Date(condition.from))
   query.lessThan('startAt', new Date(condition.end))
-  query.ascending('startAt')
-  query.limit(1000)
+
+  if (condition.url) {
+    query.startsWith('url', decodeURIComponent(condition.url).split('?')[0])
+  }
+  if (condition.method) {
+    query.equalTo('method', condition.method.toUpperCase())
+  }
+  if (condition.pageUrl) {
+    query.equalTo('pageUrl', decodeURIComponent(condition.pageUrl))
+  }
+
+  query.descending('startAt')
+  query.limit(condition.limit)
   return query.find()
 }
 

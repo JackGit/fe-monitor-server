@@ -11,3 +11,15 @@ exports.create = async function (basicInfo, trace) {
 
   return pv.save()
 }
+
+exports.getList = async function (condition) {
+  const query = new AV.Query('PageView')
+
+  query.greaterThanOrEqualTo('createdAt', new Date(condition.from))
+  query.equalTo('pageUrl', decodeURIComponent(condition.pageUrl))
+  query.lessThan('createdAt', new Date(condition.end))
+  query.descending('createdAt')
+  query.limit(condition.limit)
+
+  return query.find()
+}

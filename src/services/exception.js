@@ -18,7 +18,7 @@ exports.getList = async function (condition) {
   query.greaterThanOrEqualTo('createdAt', new Date(condition.from))
   query.lessThan('createdAt', new Date(condition.end))
   query.descending('createdAt')
-  query.limit(1000)
+  query.limit(condition.limit)
   return query.find()
 }
 

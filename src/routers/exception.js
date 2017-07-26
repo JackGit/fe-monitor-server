@@ -8,7 +8,8 @@ const exceptionService = require('../services/exception')
 router.get('/', async (ctx, next) => {
   const exceptionList = await exceptionService.getList({
     from: ctx.query.from * 1,
-    end: ctx.query.end * 1
+    end: ctx.query.end * 1,
+    limit: ctx.query.limit || 1000
   })
   ctx.body = exceptionList
 })
