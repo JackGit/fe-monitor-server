@@ -10,8 +10,11 @@ const AV = require('leancloud-storage')
 const cors = require('kcors')
 const config = require('./config')
 const router = require('./routers')
+const Database = require('./db')
+
 const app = new Koa()
 const PORT = config.PORT
+const DB_URL = config.DB_URL
 
 AV.init({
   appId: config.AV.APP_ID,
@@ -39,6 +42,10 @@ app.use(bodyParser())
 // routers
 app.use(router.routes())
 
-app.listen(PORT, () => {
-  console.log('server is running on port', PORT)
+// connect database and start server
+Database.connect(DB_URL, () => {
+  console.log('db is connected')
+  app.listen(PORT, () => {
+    console.log('server is running on port', PORT)
+  })
 })

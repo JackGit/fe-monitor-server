@@ -1,6 +1,7 @@
 const uaParser = require('ua-parser-js')
 const ipQuery = require('lib-qqwry').init().speed()
 const random = require('lodash.random')
+const VERY_START_DATE = new Date('1970-01-01')
 
 /**
  * ip, os, browser, platform, page url, full url, network provider, location, rawUserAgent, resolution
@@ -10,6 +11,12 @@ const random = require('lodash.random')
 exports.setBasicInfoToAVObject = function (avObject, basicInfo) {
   ['ip', 'pageUrl', 'fullUrl', 'os', 'browser', 'device', 'resolution', 'province', 'networkOperator', 'userAgent']
   .forEach(key => avObject.set(key, basicInfo[key]))
+}
+
+exports.setBasicInfoToObject = function (obj, basicInfo) {
+  ['projectId', 'ip', 'pageUrl', 'fullUrl', 'os', 'browser', 'device', 'resolution', 'province', 'networkOperator', 'userAgent']
+  .forEach(key => obj[key] = basicInfo[key])
+  obj.createdAt = new Date()
 }
 
 exports.extendBasicInfo = function (data) {
@@ -27,6 +34,24 @@ exports.extendBasicInfo = function (data) {
     province: ipInfo.province,
     networkOperator: ipInfo.networkOperator,
     userAgent: data.userAgent
+  }
+}
+
+/**
+ * return object would be used in:
+ * {
+ *   $group: { _id: result }
+ * }
+ * @param  {String} field    field name (without $)
+ * @param  {Number} interval millisecond
+ * @return {Object}
+ */
+exports.getIdOfGroupByTimeInterval = function (field, interval) {
+  return {
+    $subtract: [
+      { $subtract: [ `$${field}`,  VERY_START_DATE ]},
+      { $mod: [{ $subtract: [ `$${field}`, VERY_START_DATE ]}, interval ]}
+    ]
   }
 }
 
