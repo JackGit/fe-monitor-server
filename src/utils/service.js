@@ -1,7 +1,37 @@
 const uaParser = require('ua-parser-js')
 const ipQuery = require('lib-qqwry').init().speed()
 const random = require('lodash.random')
-const VERY_START_DATE = new Date('1970-01-01')
+
+exports.commonListQuerySetting = function ({ distinctFields, fields, sort, ascending }) {
+  let $group
+  let $project
+  let $sort
+
+  // set distinct fields
+  if (condition.distinctFields.length > 0) {
+    $group = { _id: {}}
+    condition.distinctFields.forEach(field => {
+      $group._id[field] = `$${field}`
+    })
+  }
+
+  // set select fields
+  if (condition.fields.length > 0) {
+    $project = {}
+    condition.fields.forEach(field => $project[field] = 1)
+  }
+
+  // sort
+  if (condition.sort) {
+    $sort = { [condition.sort]: condition.ascending ? -1 : 1 }
+  }
+
+  return {
+    $group,
+    $project,
+    $sort
+  }
+}
 
 /**
  * ip, os, browser, platform, page url, full url, network provider, location, rawUserAgent, resolution
@@ -37,6 +67,8 @@ exports.extendBasicInfo = function (data) {
   }
 }
 
+
+const VERY_START_DATE = new Date('1970-01-01')
 /**
  * return object would be used in:
  * {

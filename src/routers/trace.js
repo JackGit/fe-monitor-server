@@ -2,7 +2,7 @@ const router = require('koa-router')()
 const pvService = require('../services/page-view')
 const uvService = require('../services/unique-visitor')
 const exceptionService = require('../services/exception')
-const asyncRequestService = require('../services/async-request')
+const ajaxRequestService = require('../services/ajax-request')
 const extendBasicInfo = require('../utils/service').extendBasicInfo
 const fakeIP = require('../utils/service').fakeIP
 
@@ -25,7 +25,7 @@ router.post('/', async (ctx, next) => {
           break;
         case 'ajax':
         case 'fetch':
-          response = await asyncRequestService.create(basicInfo, trace)
+          response = await ajaxRequestService.create(basicInfo, trace)
           break;
         case 'pv':
           response = await pvService.create(basicInfo, trace)

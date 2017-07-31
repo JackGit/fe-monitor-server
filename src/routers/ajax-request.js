@@ -2,14 +2,6 @@ const router = require('koa-router')()
 const ajaxRequestService = require('../services/ajax-request')
 
 /**
- * get async request details by id
- */
-router.get('/:ajaxRequestId', async (ctx, next) => {
-  const ajaxRequest = await ajaxRequestService.get(ctx.params.ajaxRequestId)
-  ctx.body = ajaxRequest
-})
-
-/**
  * get distinct data (method, url) by query parameters
  * query parameters:
  * @param {String} pageUrl optional
