@@ -2,11 +2,12 @@ const Database = require('../db')
 const utils = require('../utils/service')
 const setBasicInfoToObject = utils.setBasicInfoToObject
 const getIdOfGroupByTimeInterval = utils.getIdOfGroupByTimeInterval
+const fillTimeIntervalGaps = utils.fillTimeIntervalGaps
 
 exports.create = async function (basicInfo, trace) {
   const exceptionCollection = Database.collection('Exception')
   const exceptionDocument = {
-    name: trace.name,
+    type: trace.name,
     message: trace.message,
     stack: trace.stack || []
   }
@@ -21,9 +22,6 @@ exports.get = async function (id) {
 }
 
 exports.getList = async function (condition) {
-  // TODO: 这里有一些参数默认值和一些验证，比如limit需要为正确范围内的整数等等
-  // 这些逻辑应该放在service外层是做，service应该直接接受正确数据
-  // 那么上一层，router，在pass到service之前，应该对接口参数进行校验和转换，有问题直接范围“参数不正确”的response
   const exceptionCollection = Database.collection('Exception')
   const sort = condition.sort ? {
     [condition.sort]: condition.ascending ? -1 : 1
@@ -34,31 +32,43 @@ exports.getList = async function (condition) {
     query.createdAt = { $gte: condition.from, $lt: condition.end }
   }
 
-  if (condition.name) {
-    query.name = condition.name
+  if (condition.type) {
+    query.type = condition.type
   }
 
   return exceptionCollection.find(query).skip(condition.skip).limit(condition.limit).sort(sort).toArray()
 }
 
-exports.getTypeStatistic = async function (condition) {
+exports.statsTypes = async function ({ from, end }) {
   const exceptionCollection = Database.collection('Exception')
-  const $match = { createdAt: { $exists: 1, $gte: condition.from, $lt: condition.end }}
-  const $group = { _id: '$name', count: { $sum: 1 }}
-  return exceptionCollection.aggregate([{ $match }, { $group }]).toArray()
+  const $match = { createdAt: { $gte: from, $lt: end }}
+  const $group = { _id: '$type', count: { $sum: 1 }}
+  const result = await exceptionCollection.aggregate([{ $match }, { $group }]).toArray()
+  return result.map(({ _id, count }) => ({
+    type: _id,
+    count
+  }))
 }
 
-exports.getFrequencyStatistic = async function (condition) {
+exports.statsFrequency = async function ({ type, from, end, interval }) {
   const exceptionCollection = Database.collection('Exception')
-  const $match = { createdAt: { $exists: 1, $gte: condition.from, $lt: condition.end }}
+  const $match = {
+    createdAt: { $gte: from, $lt: end }
+  }
   const $group = {
-    _id: getIdOfGroupByTimeInterval('createdAt', condition.interval),
+    _id: getIdOfGroupByTimeInterval('createdAt', interval),
     count: { $sum: 1 }
   }
 
-  if (condition.name) {
-    $match.name = condition.name
+  if (type) {
+    $match.type = type
   }
 
-  return exceptionCollection.aggregate([{ $match }, { $group }]).toArray()
+  const result = await exceptionCollection.aggregate([{ $match }, { $group }]).toArray()
+  return fillTimeIntervalGaps(result.map(
+    ({ _id, count }) => ({
+      startTime: _id,
+      count,
+    })
+  ), from, end, interval)
 }

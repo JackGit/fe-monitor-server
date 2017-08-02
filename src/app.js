@@ -6,7 +6,6 @@ const compress = require('koa-compress')
 const onerror = require('koa-onerror')
 const favicon = require('koa-favicon')
 const bodyParser = require('koa-bodyparser')
-const AV = require('leancloud-storage')
 const cors = require('kcors')
 const config = require('./config')
 const router = require('./routers')
@@ -15,11 +14,6 @@ const Database = require('./db')
 const app = new Koa()
 const PORT = config.PORT
 const DB_URL = config.DB_URL
-
-AV.init({
-  appId: config.AV.APP_ID,
-  appKey: config.AV.APP_KEY
-})
 
 // error handling
 onerror(app)

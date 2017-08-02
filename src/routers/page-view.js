@@ -1,18 +1,19 @@
 const router = require('koa-router')()
 const pageViewService = require('../services/page-view')
 
+/**
+ * query list data of page-view
+ * 获取所有pageUrl（distinct）: ?distinctFields=pageUrl&fields=pageUrl&sort=pageUrl&ascending=false
+ * @type {[type]}
+ */
 router.get('/', async (ctx, next) => {
+  const { distinctFields, fields, sort = 'createdAt', ascending = true } = ctx.query
   const result = await pageViewService.getList({
-    from: +ctx.query.from,
-    end: +ctx.query.end,
-    pageUrl: ctx.query.pageUrl,
-    limit: ctx.query.limit || 1000
+    distinctFields: distinctFields ? distinctFields.split(',') : [],
+    fields: fields ? fields.split(',') : [],
+    sort,
+    ascending: !!ascending
   })
-  ctx.body = result
-})
-
-router.get('/:pageViewId', async (ctx, next) => {
-  const result = await pageViewService.get(ctx.params.pageViewId)
   ctx.body = result
 })
 

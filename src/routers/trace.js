@@ -3,8 +3,9 @@ const pvService = require('../services/page-view')
 const uvService = require('../services/unique-visitor')
 const exceptionService = require('../services/exception')
 const ajaxRequestService = require('../services/ajax-request')
+const resourceRequestService = require('../services/resource-request')
 const extendBasicInfo = require('../utils/service').extendBasicInfo
-const fakeIP = require('../utils/service').fakeIP
+const fakeIP = require('../utils/ip').fakeIP
 
 router.post('/', async (ctx, next) => {
   let response
@@ -26,6 +27,9 @@ router.post('/', async (ctx, next) => {
         case 'ajax':
         case 'fetch':
           response = await ajaxRequestService.create(basicInfo, trace)
+          break;
+        case 'resource':
+          response = await resourceRequestService.create(basicInfo, trace)
           break;
         case 'pv':
           response = await pvService.create(basicInfo, trace)

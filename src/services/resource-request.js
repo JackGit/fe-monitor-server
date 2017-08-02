@@ -2,100 +2,67 @@ const Database = require('../db')
 const utils = require('../utils/service')
 const setBasicInfoToObject = utils.setBasicInfoToObject
 const getIdOfGroupByTimeInterval = utils.getIdOfGroupByTimeInterval
+const commonListQuerySetting = utils.commonListQuerySetting
+const fillTimeIntervalGaps = utils.fillTimeIntervalGaps
+const getAggregation = utils.getAggregation
 
-exports.create = async function (basicInfo, resourceTiming) {
-  const resourceRequestCollection = Database.collection('ResourceRequest')
-  const resourceRequestDocument = {
-    url: resourceTiming.name,
-    type: resourceTiming.name.substring(resourceTiming.name.lastIndexOf('.') + 1),
-    size: resourceTiming.size,
-    startAt: new Date(resourceTiming.start),
-    endAt: new Date(resourceTiming.end),
-    duration: resourceTiming.duration
+exports.create = async function (basicInfo, trace) {
+  if (trace.timing.length === 0) {
+    return
   }
 
-  setBasicInfoToObject(resourceRequestDocument, basicInfo)
-  return resourceRequestCollection.insertOne(resourceRequestDocument)
+  const resourceTiming = trace.timing
+  const resourceRequestCollection = Database.collection('ResourceRequest')
+  const resourceRequestDocuments = []
+
+  resourceTiming.forEach(item => {
+    const doc = {
+      url: item.name,
+      type: item.name.substring(item.name.lastIndexOf('.') + 1),
+      size: item.size,
+      duration: item.duration
+    }
+    setBasicInfoToObject(doc, basicInfo)
+    resourceRequestDocuments.push(doc)
+  })
+
+  return resourceRequestCollection.insertMany(resourceRequestDocuments)
 }
 
 exports.getList = async function (condition) {
   const resourceRequestCollection = Database.collection('ResourceRequest')
-  let $match = {}
-  let $group = null
-  let $project = null
-  let $sort = null
-
-  // set distinct fields
-  if (condition.distinctFields.length > 0) {
-    $group = { _id: {}}
-    condition.distinctFields.forEach(field => {
-      $group._id[field] = `$${field}`
-    })
-  }
-
-  // set select fields
-  if (condition.fields.length > 0) {
-    $project = {}
-    condition.fields.forEach(field => $project[field] = 1)
-  }
-
-  // sort
-  if (condition.sort) {
-    $sort = { [condition.sort]: condition.ascending ? -1 : 1 }
-  }
+  const listQuerySettings = commonListQuerySetting(condition)
+  const aggregation = []
 
   // other match fields
-  if (condition.type) {
-    $match.type = type
-  }
-  if (condition.pageUrl) {
-    $match.pageUrl = decodeURIComponent(condition.pageUrl)
-  }
+  ;['type', 'pageUrl'].forEach(key => {
+    if (condition[key]) {
+      listQuerySettings.$match || (listQuerySettings.$match = {})
+      listQuerySettings.$match[key] = condition[key]
+    }
+  })
 
-  return resourceRequestCollection.aggregate([
-    { $match },
-    { $group },
-    { $project },
-    { $sort }
-  ]).toArray()
+  aggregation = getAggregation(listQuerySettings)
+  return resourceRequestCollection.aggregate(aggregation).toArray()
 }
 
-exports.getDistinct = async function (condition) {
-  const resourceRequestCollection = Database.collection('ResourceRequest')
-  const $project = { url: 1 }
-  const $group = { _id: '$url' }
-  const $match = {} // TODO projectId
-  const $sort = condition.sort ? {
-    [condition.sort]: condition.ascending ? -1 : 1
-  } : null
-
-  if (condition.type) {
-    $match.type = type
-  }
-  if (condition.pageUrl) {
-    $match.pageUrl = decodeURIComponent(condition.pageUrl)
-  }
-
-  return resourceRequestCollection.aggregate([
-    { $match },
-    { $group },
-    { $project },
-    { $sort }
-  ]).toArray()
-}
-
-exports.getFrequencyStatistic = async function (condition) {
+exports.stats = async function ({ url, method, from, end, interval }) {
   const resourceRequestCollection = Database.collection('ResourceRequest')
   const $match = {
-    url: decodeURIComponent(condition.url),
-    type: condition.type,
-    startAt: { $gte: condition.from, $lt: condition.end }
+    url,
+    type,
+    startAt: { $gte: from, $lt: end }
   }
   const $group = {
-    _id: getIdOfGroupByTimeInterval('startAt', condition.interval),
+    _id: getIdOfGroupByTimeInterval('startAt', interval),
     count: { $sum: 1 },
     avgDuration: { $avg: '$duration' }
   }
 
-  return resourceRequestCollection.aggregate([{ $match }, { $group }]).toArray()
+  return fillTimeIntervalGaps(
+    resourceRequestCollection.aggregate([{ $match }, { $group }]).toArray(),
+    from,
+    end,
+    interval
+  )
 }

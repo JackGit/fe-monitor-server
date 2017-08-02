@@ -1,29 +1,29 @@
 const uaParser = require('ua-parser-js')
-const ipQuery = require('lib-qqwry').init().speed()
-const random = require('lodash.random')
+const getIPInfo = require('./ip').getIPInfo
 
-exports.commonListQuerySetting = function ({ distinctFields, fields, sort, ascending }) {
+exports.commonListQuerySetting = function ({ distinctFields = [], fields = [], sort, ascending }) {
   let $group
   let $project
   let $sort
 
   // set distinct fields
-  if (condition.distinctFields.length > 0) {
+  if (distinctFields.length > 0) {
     $group = { _id: {}}
-    condition.distinctFields.forEach(field => {
+    distinctFields.forEach(field => {
       $group._id[field] = `$${field}`
+      $group[field] = { $first: `$${field}` }
     })
   }
 
   // set select fields
-  if (condition.fields.length > 0) {
+  if (fields.length > 0) {
     $project = {}
-    condition.fields.forEach(field => $project[field] = 1)
+    fields.forEach(field => $project[field] = 1)
   }
 
   // sort
-  if (condition.sort) {
-    $sort = { [condition.sort]: condition.ascending ? -1 : 1 }
+  if (sort) {
+    $sort = { [sort]: ascending ? -1 : 1 }
   }
 
   return {
@@ -33,14 +33,12 @@ exports.commonListQuerySetting = function ({ distinctFields, fields, sort, ascen
   }
 }
 
-/**
- * ip, os, browser, platform, page url, full url, network provider, location, rawUserAgent, resolution
- * @param  {Object} avObject  [description]
- * @param  {Object} basicInfo [description]
- */
-exports.setBasicInfoToAVObject = function (avObject, basicInfo) {
-  ['ip', 'pageUrl', 'fullUrl', 'os', 'browser', 'device', 'resolution', 'province', 'networkOperator', 'userAgent']
-  .forEach(key => avObject.set(key, basicInfo[key]))
+exports.getAggregation = function (settings) {
+  const aggregation = []
+  Object.keys(settings)
+    .filter(key => settings[key])
+    .forEach(key => aggregation.push({ [key]: settings[key] }))
+  return aggregation
 }
 
 exports.setBasicInfoToObject = function (obj, basicInfo) {
@@ -54,6 +52,7 @@ exports.extendBasicInfo = function (data) {
   const ipInfo = getIPInfo(data.ip)
 
   return {
+    projectId: data.projectId,
     ip: data.ip,
     pageUrl: data.pageUrl,
     fullUrl: data.fullUrl,
@@ -87,42 +86,34 @@ exports.getIdOfGroupByTimeInterval = function (field, interval) {
   }
 }
 
-exports.fakeIP = function () {
-  return [random(1, 254), random(1, 254), random(1, 254), random(1, 254)].join('.')
-}
-
-function getIPInfo (ip) {
-  if (!ip) {
-    return {
-      province: '',
-      networkOperator: ''
-    }
-  } else {
-    const result = ipQuery.searchIP(ip)
-    return {
-      province: getProvinceShortName(result.Country.trim()),
-      networkOperator: getNetworkOperator(result.Area.trim())
-    }
+exports.fillTimeIntervalGaps = function (data, from, end, interval) {
+  if (data.length === 0) {
+    return []
   }
-}
 
+  const startTime = (from - VERY_START_DATE) - (from - VERY_START_DATE) % interval
+  const keys = Object.keys(data[0]).filter(key => key !== 'startTime')
+  const arr = []
+  const temp = {}
+  let time = startTime
 
-function getProvinceShortName (value) {
-  const spec = ['北京', '天津', '上海', '重庆', '内蒙', '广西', '西藏', '宁夏', '新疆', '香港', '澳门']
-  const name = spec.filter(n => value.indexOf(n) !== -1)[0]
-  const index = value.indexOf('省')
+  data.forEach(item => {
+    temp[item.startTime] = {}
+    keys.forEach(key => temp[item.startTime][key] = item[key])
+  })
 
-  if (name) {
-    return name
-  } if (index !== -1) {
-    return value.substring(0, index)
-  } else {
-    console.warn('未知省份', value)
-    return '其他'
+  while (time < end) {
+    let item = { startTime: time }
+    keys.forEach(key => {
+      if (temp[time] && temp[time][key]) {
+        item[key] = temp[time][key]
+      } else {
+        item[key] = 0
+      }
+    })
+    arr.push(item)
+    time += interval
   }
-}
 
-function getNetworkOperator (value) {
-  // TODO：电信，网通，移动，联通，长城，其他
-  return value
+  return arr
 }

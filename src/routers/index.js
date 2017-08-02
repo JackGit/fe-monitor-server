@@ -6,6 +6,7 @@ const pageViewRouter = require('./page-view')
 const uniqueVisitorRouter = require('./unique-visitor')
 const ajaxRequestRouter = require('./ajax-request')
 const resourceRequestRouter = require('./resource-request')
+const statsRouter = require('./stats')
 
 router.use('/trace', traceRouter.routes())
 router.use('/projects', projectRouter.routes())
@@ -14,5 +15,6 @@ router.use('/page-view', pageViewRouter.routes())
 router.use('/unique-visitor', uniqueVisitorRouter.routes())
 router.use('/ajax-requests', ajaxRequestRouter.routes())
 router.use('/resource-requests', resourceRequestRouter.routes())
+router.use('/stats', statsRouter.routes())
 
 module.exports = router

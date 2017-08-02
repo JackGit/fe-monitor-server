@@ -29,7 +29,6 @@
     "koa-router": "^7.2.1",
     "koa-session": "^5.4.0",
     "koa-static": "^4.0.1",
-    "leancloud-storage": "^3.0.2",
     "lib-qqwry": "^1.0.2",
     "lodash.random": "^3.2.0",
     "mongodb": "^2.2.30",
