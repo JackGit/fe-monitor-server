@@ -18,7 +18,7 @@ exports.create = async function (basicInfo, trace) {
 
 exports.get = async function (id) {
   const exceptionCollection = Database.collection('Exception')
-  return exceptionCollection.findOne({_id: Database.utils.ObjectId(id)})
+  return exceptionCollection.findOne({ _id: Database.utils.ObjectId(id) })
 }
 
 exports.getList = async function (condition) {

@@ -21,10 +21,11 @@ router.get('/', async (ctx, next) => {
 })
 
 /**
- * get project
+ * delete project
  */
-router.get('/:projectId', async (ctx, next) => {
-
+router.delete('/:projectId', async (ctx, next) => {
+  const response = await projectService.remove(ctx.params.projectId)
+  ctx.body = response
 })
 
 router.get('/statistic/uv', async (ctx, next) => {
