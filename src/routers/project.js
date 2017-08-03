@@ -6,14 +6,18 @@ const uniqueVistorService = require('../services/unique-visitor')
  * create project
  */
 router.post('/', async (ctx, next) => {
-
+  const { name, url, desc } = ctx.request.body
+  const response = await projectService.create({ name, url, desc })
+  ctx.body = response
 })
 
 /**
  * get project list
  */
 router.get('/', async (ctx, next) => {
-  
+  const { sort = 'createdAt', ascending = true } = ctx.query
+  const response = await projectService.getList({ sort, ascending: !!ascending })
+  ctx.body = response
 })
 
 /**

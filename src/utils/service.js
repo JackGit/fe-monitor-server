@@ -1,10 +1,11 @@
 const uaParser = require('ua-parser-js')
 const getIPInfo = require('./ip').getIPInfo
 
-exports.commonListQuerySetting = function ({ distinctFields = [], fields = [], sort, ascending }) {
+exports.commonListQuerySetting = function ({ distinctFields = [], fields = [], limit, sort, ascending }) {
   let $group
   let $project
   let $sort
+  let $limit
 
   // set distinct fields
   if (distinctFields.length > 0) {
@@ -26,10 +27,16 @@ exports.commonListQuerySetting = function ({ distinctFields = [], fields = [], s
     $sort = { [sort]: ascending ? -1 : 1 }
   }
 
+  // limit
+  if (limit) {
+    $limit = limit
+  }
+
   return {
     $group,
     $project,
-    $sort
+    $sort,
+    $limit
   }
 }
 
