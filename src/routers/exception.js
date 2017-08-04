@@ -13,10 +13,11 @@ const exceptionService = require('../services/exception')
  * @param {Boolean} ascending optional
  */
 router.get('/', async (ctx, next) => {
-  const { projectId, type, from, end, skip = 0, limit = 200, sort = 'createdAt', ascending = true } = ctx.query
+  const { projectId, type, from, end, fields, skip = 0, limit = 200, sort = 'createdAt', ascending = true } = ctx.query
   const exceptionList = await exceptionService.getList({
     projectId,
     type,
+    fields: fields ? fields.split(',') : [],
     from: from && new Date(+from),
     end: end && new Date(+end),
     skip: +skip,

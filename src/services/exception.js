@@ -27,6 +27,7 @@ exports.getList = async function (condition) {
     [condition.sort]: condition.ascending ? -1 : 1
   } : null
   const query = { projectId: condition.projectId }
+  const projection = {}
 
   if (condition.from && condition.end) {
     query.createdAt = { $gte: condition.from, $lt: condition.end }
@@ -36,7 +37,9 @@ exports.getList = async function (condition) {
     query.type = condition.type
   }
 
-  return exceptionCollection.find(query).skip(condition.skip).limit(condition.limit).sort(sort).toArray()
+  condition.fields.forEach(field => projection[field] = 1)
+
+  return exceptionCollection.find(query).skip(condition.skip).limit(condition.limit).sort(sort).project(projection).toArray()
 }
 
 exports.statsTypes = async function ({ projectId, from, end }) {
