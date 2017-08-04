@@ -1,2 +1,2 @@
-exports.PORT = 4141
-exports.DB_URL = 'mongodb://yotta-tech.cn:27017/fm-dev'
+exports.PORT = 9003
+exports.DB_URL = 'mongodb://jackyang.me:27017/fm-dev'
