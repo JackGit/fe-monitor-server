@@ -20,13 +20,15 @@ exports.getList = async function (condition) {
   const pvCollection = Database.collection('PageView')
   const listQuerySettings = commonListQuerySetting(condition)
   const aggregation = getAggregation(listQuerySettings)
+  const $match = { projectId: condition.projectId }
+  aggregation.unshift({ $match })
 
   return pvCollection.aggregate(aggregation).toArray()
 }
 
-exports.statsPV = async function ({ pageUrl, from, end, interval }) {
+exports.statsPV = async function ({ projectId, pageUrl, from, end, interval }) {
   const pvCollection = Database.collection('PageView')
-  const $match = { createdAt: { $gte: from, $lt: end }}
+  const $match = { projectId, createdAt: { $gte: from, $lt: end }}
   const $group = {
     _id: getIdOfGroupByTimeInterval('createdAt', interval),
     count: { $sum: 1 }
@@ -47,9 +49,10 @@ exports.statsPV = async function ({ pageUrl, from, end, interval }) {
   ), from, end, interval)
 }
 
-exports.statsTiming = async function ({ pageUrl, from, end, interval }) {
+exports.statsTiming = async function ({ projectId, pageUrl, from, end, interval }) {
   const pvCollection = Database.collection('PageView')
   const $match = {
+    projectId,
     pageUrl,
     createdAt: { $gte: from, $lt: end }
   }

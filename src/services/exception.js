@@ -26,7 +26,7 @@ exports.getList = async function (condition) {
   const sort = condition.sort ? {
     [condition.sort]: condition.ascending ? -1 : 1
   } : null
-  const query = {}
+  const query = { projectId: condition.projectId }
 
   if (condition.from && condition.end) {
     query.createdAt = { $gte: condition.from, $lt: condition.end }
@@ -39,9 +39,9 @@ exports.getList = async function (condition) {
   return exceptionCollection.find(query).skip(condition.skip).limit(condition.limit).sort(sort).toArray()
 }
 
-exports.statsTypes = async function ({ from, end }) {
+exports.statsTypes = async function ({ projectId, from, end }) {
   const exceptionCollection = Database.collection('Exception')
-  const $match = { createdAt: { $gte: from, $lt: end }}
+  const $match = { projectId, createdAt: { $gte: from, $lt: end }}
   const $group = { _id: '$type', count: { $sum: 1 }}
   const result = await exceptionCollection.aggregate([{ $match }, { $group }]).toArray()
   return result.map(({ _id, count }) => ({
@@ -50,11 +50,9 @@ exports.statsTypes = async function ({ from, end }) {
   }))
 }
 
-exports.statsFrequency = async function ({ type, from, end, interval }) {
+exports.statsFrequency = async function ({ projectId, type, from, end, interval }) {
   const exceptionCollection = Database.collection('Exception')
-  const $match = {
-    createdAt: { $gte: from, $lt: end }
-  }
+  const $match = { projectId, createdAt: { $gte: from, $lt: end }}
   const $group = {
     _id: getIdOfGroupByTimeInterval('createdAt', interval),
     count: { $sum: 1 }

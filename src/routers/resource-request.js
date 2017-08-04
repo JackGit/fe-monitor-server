@@ -17,8 +17,9 @@ const resourceRequestService = require('../services/resource-request')
  * @param {Number} pageIndex optional
  */
 router.get('/', async (ctx, next) => {
-  const { distinctFields, fields, sort = 'url', ascending = false } = ctx.query
+  const { projectId, distinctFields, fields, sort = 'url', ascending = false } = ctx.query
   const response = await resourceRequestService.getList({
+    projectId,
     distinctFields: distinctFields ? distinctFields.split(',') : [],
     fields: fields ? fields.split(',') : [],
     sort,

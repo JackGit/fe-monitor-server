@@ -7,8 +7,9 @@ const pageViewService = require('../services/page-view')
  * @type {[type]}
  */
 router.get('/', async (ctx, next) => {
-  const { distinctFields, fields, sort = 'createdAt', ascending = true } = ctx.query
+  const { projectId, distinctFields, fields, sort = 'createdAt', ascending = true } = ctx.query
   const result = await pageViewService.getList({
+    projectId,
     distinctFields: distinctFields ? distinctFields.split(',') : [],
     fields: fields ? fields.split(',') : [],
     sort,

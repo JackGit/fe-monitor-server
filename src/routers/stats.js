@@ -24,8 +24,9 @@ const uvService = require('../services/unique-visitor')
  * @param {Number} interval required
  */
 router.get('/ajax-request', async (ctx, next) => {
-  const { url, method, from, end, interval } = ctx.query
+  const { projectId, url, method, from, end, interval } = ctx.query
   const response = await ajaxRequestService.stats({
+    projectId,
     url,
     method: method.toUpperCase(),
     from: new Date(+from),
@@ -45,8 +46,9 @@ router.get('/ajax-request', async (ctx, next) => {
  * @param {Number} end optional
  */
 router.get('/exception/types', async (ctx, next) => {
-  const { from, end } = ctx.query
+  const { projectId, from, end } = ctx.query
   const response = await exceptionService.statsTypes({
+    projectId,
     from: new Date(+from),
     end: new Date(+end)
   })
@@ -64,8 +66,9 @@ router.get('/exception/types', async (ctx, next) => {
  * @param {Number} interval required
  */
 router.get('/exception/frequency', async (ctx, next) => {
-  const { type, from, end, interval } = ctx.query
+  const { projectId, type, from, end, interval } = ctx.query
   const response = await exceptionService.statsFrequency({
+    projectId,
     type,
     from: new Date(+from),
     end: new Date(+end),
@@ -84,8 +87,9 @@ router.get('/exception/frequency', async (ctx, next) => {
  * @param {Number} interval required
  */
 router.get('/resource', async (ctx, next) => {
-  const { url, type, from, end, interval } = ctx.query
+  const { projectId, url, type, from, end, interval } = ctx.query
   const response = await resourceService.stats({
+    projectId,
     url,
     type,
     from: new Date(+from),
@@ -96,8 +100,9 @@ router.get('/resource', async (ctx, next) => {
 })
 
 router.get('/page/timing', async (ctx, next) => {
-  const { pageUrl, from, end, interval } = ctx.query
+  const { projectId, pageUrl, from, end, interval } = ctx.query
   const response = await pageViewService.statsTiming({
+    projectId,
     pageUrl,
     from: new Date(+from),
     end: new Date(+end),
@@ -107,8 +112,9 @@ router.get('/page/timing', async (ctx, next) => {
 })
 
 router.get('/page/pv', async (ctx, next) => {
-  const { pageUrl, from, end, interval } = ctx.query
+  const { projectId, pageUrl, from, end, interval } = ctx.query
   const response = await pageViewService.statsPV({
+    projectId,
     pageUrl,
     from: new Date(+from),
     end: new Date(+end),
@@ -118,8 +124,9 @@ router.get('/page/pv', async (ctx, next) => {
 })
 
 router.get('/site/pv', async (ctx, next) => {
-  const { from, end, interval } = ctx.query
+  const { projectId, from, end, interval } = ctx.query
   const response = await pageViewService.statsPV({
+    projectId,
     from: new Date(+from),
     end: new Date(+end),
     interval: +interval
@@ -128,8 +135,9 @@ router.get('/site/pv', async (ctx, next) => {
 })
 
 router.get('/site/uv', async (ctx, next) => {
-  const { from, end, interval } = ctx.query
+  const { projectId, from, end, interval } = ctx.query
   const response = await uvService.statsUV({
+    projectId,
     from: new Date(+from),
     end: new Date(+end),
     interval: +interval
@@ -138,8 +146,9 @@ router.get('/site/uv', async (ctx, next) => {
 })
 
 router.get('/site/browsers', async (ctx, next) => {
-  const { from, end } = ctx.query
+  const { projectId, from, end } = ctx.query
   const response = await uvService.statsBrowser({
+    projectId,
     from: new Date(+from),
     end: new Date(+end)
   })
@@ -147,8 +156,9 @@ router.get('/site/browsers', async (ctx, next) => {
 })
 
 router.get('/site/os', async (ctx, next) => {
-  const { from, end } = ctx.query
+  const { projectId, from, end } = ctx.query
   const response = await uvService.statsOS({
+    projectId,
     from: new Date(+from),
     end: new Date(+end)
   })
@@ -156,8 +166,9 @@ router.get('/site/os', async (ctx, next) => {
 })
 
 router.get('/site/network-operators', async (ctx, next) => {
-  const { from, end } = ctx.query
+  const { projectId, from, end } = ctx.query
   const response = await uvService.statsNetworkOperator({
+    projectId,
     from: new Date(+from),
     end: new Date(+end)
   })
@@ -165,8 +176,9 @@ router.get('/site/network-operators', async (ctx, next) => {
 })
 
 router.get('/site/locations', async (ctx, next) => {
-  const { from, end } = ctx.query
+  const { projectId, from, end } = ctx.query
   const response = await uvService.statsLocation({
+    projectId, 
     from: new Date(+from),
     end: new Date(+end)
   })

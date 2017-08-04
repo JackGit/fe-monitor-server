@@ -11,9 +11,9 @@ exports.create = async function (basicInfo, trace) {
   return uvCollection.insertOne(uvDocument)
 }
 
-exports.statsUV = async function ({ from, end, interval }) {
+exports.statsUV = async function ({ projectId, from, end, interval }) {
   const uvCollection = Database.collection('UniqueVisitor')
-  const $match = { createdAt: { $gte: from, $lt: end }}
+  const $match = { projectId, createdAt: { $gte: from, $lt: end }}
   const $group = {
     _id: getIdOfGroupByTimeInterval('createdAt', interval),
     count: { $sum: 1 }
@@ -25,25 +25,25 @@ exports.statsUV = async function ({ from, end, interval }) {
   ), from, end, interval)
 }
 
-exports.statsBrowser = async function ({ from, end }) {
-  return statsOneField('browser', 'browser.name', from, end)
+exports.statsBrowser = async function ({ projectId, from, end }) {
+  return statsOneField('browser', 'browser.name', projectId, from, end)
 }
 
-exports.statsOS = async function ({ from, end }) {
-  return statsOneField('os', 'os.name', from, end)
+exports.statsOS = async function ({ projectId, from, end }) {
+  return statsOneField('os', 'os.name', projectId, from, end)
 }
 
-exports.statsNetworkOperator = async function ({ from, end }) {
-  return statsOneField('networkOperator', 'networkOperator', from, end)
+exports.statsNetworkOperator = async function ({ projectId, from, end }) {
+  return statsOneField('networkOperator', 'networkOperator', projectId, from, end)
 }
 
-exports.statsLocation = async function ({ from, end }) {
-  return statsOneField('province', 'province', from, end)
+exports.statsLocation = async function ({ projectId, from, end }) {
+  return statsOneField('province', 'province', projectId, from, end)
 }
 
-async function statsOneField (field, groupBy, from, end) {
+async function statsOneField (field, groupBy, projectId, from, end) {
   const uvCollection = Database.collection('UniqueVisitor')
-  const $match = { createdAt: { $gte: from, $lt: end }}
+  const $match = { projectId, createdAt: { $gte: from, $lt: end }}
   const $group = { _id: `$${groupBy}`, count: { $sum: 1 }}
   const result = await uvCollection.aggregate([{ $match }, { $group }]).toArray()
   return result.map(({ _id, count }) => ({ [field]: _id, count }))

@@ -24,6 +24,9 @@ exports.getList = async function (condition) {
   const ajaxRequestCollection = Database.collection('AjaxRequest')
   const listQuerySettings = commonListQuerySetting(condition)
   const aggregation = getAggregation(listQuerySettings)
+  const $match = { projectId: condition.projectId }
+
+  aggregation.unshift({ $match })
   return ajaxRequestCollection.aggregate(aggregation).toArray()
 }
 
@@ -35,9 +38,10 @@ exports.stats = async function (condition) {
   }
 }
 
-async function getStatusStatistic ({ url, method, from, end }) {
+async function getStatusStatistic ({ projectId, url, method, from, end }) {
   const ajaxRequestCollection = Database.collection('AjaxRequest')
   const $match = {
+    projectId,
     url,
     method,
     startAt: { $gte: from, $lt: end }
@@ -51,9 +55,10 @@ async function getStatusStatistic ({ url, method, from, end }) {
   }))
 }
 
-async function getFrequencyStatistic ({ url, method, from, end, interval }) {
+async function getFrequencyStatistic ({ projectId, url, method, from, end, interval }) {
   const ajaxRequestCollection = Database.collection('AjaxRequest')
   const $match = {
+    projectId,
     url,
     method,
     startAt: { $gte: from, $lt: end }

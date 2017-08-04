@@ -32,23 +32,24 @@ exports.create = async function (basicInfo, trace) {
 exports.getList = async function (condition) {
   const resourceRequestCollection = Database.collection('ResourceRequest')
   const listQuerySettings = commonListQuerySetting(condition)
-  const aggregation = []
+  const $match = { projectId: condition.projectId }
+  const aggregation = getAggregation(listQuerySettings)
 
   // other match fields
   ;['type', 'pageUrl'].forEach(key => {
     if (condition[key]) {
-      listQuerySettings.$match || (listQuerySettings.$match = {})
-      listQuerySettings.$match[key] = condition[key]
+      $match[key] = condition[key]
     }
   })
 
-  aggregation = getAggregation(listQuerySettings)
+  aggregation.unshift({ $match })
   return resourceRequestCollection.aggregate(aggregation).toArray()
 }
 
-exports.stats = async function ({ url, method, from, end, interval }) {
+exports.stats = async function ({ projectId, url, method, from, end, interval }) {
   const resourceRequestCollection = Database.collection('ResourceRequest')
   const $match = {
+    projectId,
     url,
     type,
     startAt: { $gte: from, $lt: end }

@@ -10,8 +10,9 @@ const ajaxRequestService = require('../services/ajax-request')
  * @param {Boolean} ascending optional
  */
 router.get('/', async (ctx, next) => {
-  const { distinctFields, fields, limit, sort = 'url', ascending = true } = ctx.query
+  const { projectId, distinctFields, fields, limit, sort = 'url', ascending = true } = ctx.query
   const response = await ajaxRequestService.getList({
+    projectId,
     distinctFields: distinctFields ? distinctFields.split(',') : [],
     fields: fields ? fields.split(',') : [],
     sort,
