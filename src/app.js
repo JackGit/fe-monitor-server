@@ -34,6 +34,7 @@ app.use(compress())
 app.use(cors({
   origin (ctx) {
     let o = ctx.request.headers.origin
+    console.log('domains => ', corsUtils.corsDomains())
     if (corsUtils.corsDomains().filter(domain => o.endsWith(domain)).length > 0) {
       return o
     }
