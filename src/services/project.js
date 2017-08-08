@@ -19,7 +19,7 @@ exports.remove = async function (id) {
     { $set: { deleted: true }}
   ).then(response => {
     corsUtils.removeDomain(response.value.url)
-    return { _id, name: response.value.name, value: response.value.url }
+    return { _id: id, name: response.value.name, value: response.value.url }
   })
 }
 
