@@ -10,7 +10,7 @@ exports.create = async function (basicInfo, trace) {
   const ajaxRequestCollection = Database.collection('AjaxRequest')
   const ajaxRequestDocument = {
     url: trace.url,
-    method: trace.method,
+    method: trace.method.toUpperCase(),
     startAt: new Date(trace.startTiming),
     endAt: new Date(trace.endTiming),
     duration: trace.duration,
