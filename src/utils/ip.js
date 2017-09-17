@@ -27,7 +27,7 @@ function getProvinceShortName (value) {
 
   if (name) {
     return name
-  } if (index !== -1) {
+  } else if (index !== -1) {
     return value.substring(0, index)
   } else {
     console.warn('未知省份', value)
